@@ -8,8 +8,6 @@ class Version
   key :message, String
   key :updater_id, String
 
-  ensure_index [[:doc_id, 1], [:pos, -1]]
-
   def content(key)
     cdata = self.data[key]
     if cdata.respond_to?(:join)
@@ -17,5 +15,10 @@ class Version
     else
       cdata
     end
-  end  
+  end
+
+
+  def self.create_indexes
+    ensure_index [[:doc_id, 1], [:pos, -1]]
+  end
 end
