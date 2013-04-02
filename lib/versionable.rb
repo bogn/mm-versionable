@@ -5,4 +5,4 @@ require "versionable/railtie" if defined?(Rails::Railtie)
 
 MongoMapper::Document.plugin(Versionable)
 
-require 'versionable/sweeper'
+require 'versionable/version_observer'

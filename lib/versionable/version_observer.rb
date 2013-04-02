@@ -1,10 +1,11 @@
 module Versionable
   # Ported from collectiveidea's audited gem this class injects the currrent_user into all Version records
   # so that you don't have to call updater_id on all modification methods.
-  # The name Sweeper got ported as well, not 100% it still applies. Maybe this except from the changelog helps:
-  # 2006-11-17 - Replaced use of singleton User.current_user with cache sweeper implementation for auditing the user that made the change
   #@see https://github.com/collectiveidea/audited/blob/250e1ba5838a6d90b69e541461ca6632b9172d4b/lib/audited/sweeper.rb
-  class Sweeper < ActiveModel::Observer
+  # The name Sweeper got changed as well, as it seems to be historical, not 100% sure about that. But
+  # https://github.com/collectiveidea/audited/blob/e24b8761f0204a8fd53252cac735137155eb1e72/lib/audit_sweeper.rb#L39
+  # points to an implentation making use of ActionController::Caching::Sweeper which the current one doesn't.
+  class VersionObserver < ActiveModel::Observer
     observe Version
 
     attr_accessor :controller
@@ -33,7 +34,7 @@ module Versionable
 
     def define_callback(klass)
       observer = self
-      callback_meth = :"_notify_versioned_sweeper"
+      callback_meth = :"_notify_versioned_observer"
       klass.send(:define_method, callback_meth) do
         observer.update(:before_create, self)
       end
@@ -44,6 +45,6 @@ end
 
 if defined?(ActionController) and defined?(ActionController::Base)
   ActionController::Base.class_eval do
-    around_filter Versionable::Sweeper.instance
+    around_filter Versionable::VersionObserver.instance
   end
 end
