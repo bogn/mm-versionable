@@ -3,6 +3,15 @@ autoload :Version, 'versionable/models/version'
 module Versionable
   extend ActiveSupport::Concern
 
+  # MODULE MANAGEMENT
+  class << self
+    attr_accessor :current_user_method
+  end
+
+  @current_user_method = :current_user
+  # END OF MODULE MANAGEMENT
+
+
   def update_attributes(attrs={})
     updater_id = attrs.delete(:updater_id)
     self.attributes = attrs

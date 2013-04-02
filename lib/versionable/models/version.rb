@@ -1,5 +1,6 @@
 class Version
   include MongoMapper::Document
+  include ActiveModel::Observing
 
   key :data, Hash
   key :date, Time
