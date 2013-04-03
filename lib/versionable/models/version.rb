@@ -8,6 +8,7 @@ class Version
   key :doc_id, ObjectId
   key :message, String
   key :updater_id, ObjectId
+  key :activity, String # e.g. 'created' or 'updated'
 
   def content(key)
     cdata = self.data[key]

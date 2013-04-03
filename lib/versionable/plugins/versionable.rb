@@ -14,19 +14,23 @@ module Versionable
 
   def update_attributes(attrs={})
     updater_id = attrs.delete(:updater_id)
+    activity = attrs.delete(:activity)
     self.attributes = attrs
-    save(:updater_id => updater_id)
+    save(:updater_id => updater_id, :activity => activity)
   end
 
   def save(options={})
+    activity = options.delete(:activity) || (new_record? ? :create : :update)
     updater_id = options.delete(:updater_id)
-    save_version(updater_id) if self.respond_to?(:rolling_back) && !rolling_back
+    save_version(activity, updater_id) if self.respond_to?(:rolling_back) && !rolling_back
     super
   end
 
-  def save_version(updater_id=nil)
+
+  def save_version(activity=nil, updater_id=nil)
     if self.respond_to?(:versions)
       version = self.current_version
+      version.activity = activity
       version.message = self.version_message
       if self.versions.empty?
         version.pos = 0
@@ -55,6 +59,8 @@ module Versionable
       attr_accessor :rolling_back
 
       key :version_number, Integer, :default => 0
+
+      define_version_callbacks
 
       define_method(:version_message) do
         @version_message
@@ -156,5 +162,18 @@ module Versionable
         end
       end
     end
+
+    private
+
+      def define_version_callbacks
+        callbacks = [:create, :update, :destroy]
+        callbacks.each do |callback|
+          send(:"after_#{callback}", :"version_for_#{callback}")
+
+          define_method(:"version_for_#{callback}") do
+            save_version(callback) if self.respond_to?(:rolling_back) && !rolling_back
+          end
+        end
+      end
   end
 end
