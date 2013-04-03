@@ -20,7 +20,7 @@ module Versionable
     end
 
     def before_create(version)
-      version.updater_id ||= current_user.id
+      version.updater_id ||= current_user.try(:id)
     end
 
     def current_user
