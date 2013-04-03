@@ -5,9 +5,9 @@ class Version
   key :data, Hash
   key :date, Time
   key :pos, Integer
-  key :doc_id, String
+  key :doc_id, ObjectId
   key :message, String
-  key :updater_id, String
+  key :updater_id, ObjectId
 
   def content(key)
     cdata = self.data[key]
