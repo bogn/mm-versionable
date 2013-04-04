@@ -12,21 +12,6 @@ module Versionable
   # END OF MODULE MANAGEMENT
 
 
-  def update_attributes(attrs={})
-    updater_id = attrs.delete(:updater_id)
-    activity = attrs.delete(:activity)
-    self.attributes = attrs
-    save(:updater_id => updater_id, :activity => activity)
-  end
-
-  def save(options={})
-    activity = options.delete(:activity) || (new_record? ? :create : :update)
-    updater_id = options.delete(:updater_id)
-    save_version(activity, updater_id) if self.respond_to?(:rolling_back) && !rolling_back
-    super
-  end
-
-
   def save_version(activity=nil, updater_id=nil)
     if self.respond_to?(:versions)
       version = self.current_version
